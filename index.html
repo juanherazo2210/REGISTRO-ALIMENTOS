@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Registro del Comedor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <svg class="swirl" viewBox="0 0 360 220" aria-hidden="true" focusable="false">
+      <path d="M-10 170 C 40 60, 120 20, 150 80 C 175 130, 110 170, 130 120 C 160 40, 280 20, 370 90" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round"/>
+    </svg>
+    <div class="hero-in">
+      <div class="hero-top">
+        <span class="pill tag">Comedor escolar</span>
+        <div class="clock" id="clock" aria-label="Hora actual">--:--</div>
+      </div>
+      <h1>Registro del comedor.</h1>
+      <p class="date" id="dateLine"></p>
+      <div class="nowline" id="nowLine"></div>
+      <nav class="tabs" role="tablist" aria-label="Secciones">
+        <button class="tab c1" role="tab" data-tab="hoy" aria-selected="true">Hoy</button>
+        <button class="tab c2" role="tab" data-tab="desperdicio" aria-selected="false">Desperdicio</button>
+        <button class="tab c3" role="tab" data-tab="horarios" aria-selected="false">Horarios</button>
+        <button class="tab c4" role="tab" data-tab="tarjetas" aria-selected="false">Tarjetas</button>
+      </nav>
+    </div>
+  </header>
+  <div id="banners"></div>
+
+  <!-- HOY -->
+  <section class="panel" id="tab-hoy">
+    <div class="stats" id="stats"></div>
+
+    <div class="two">
+      <div class="card">
+        <div class="card-head">
+          <h2>Registrar almuerzo</h2>
+          <span class="pill next" id="readerPill">Lector sin configurar</span>
+        </div>
+        <form id="regForm" autocomplete="off">
+          <div class="row">
+            <div class="field">
+              <label for="who">Estudiante</label>
+              <input id="who" list="names" placeholder="Nombre o código" data-w>
+              <datalist id="names"></datalist>
+            </div>
+            <div class="field">
+              <label for="course">Curso</label>
+              <select id="course" data-w></select>
+            </div>
+          </div>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn" type="submit" data-w>Registrar</button>
+            <button class="arrow-btn" type="button" id="goReader"><span>Lector de tarjetas</span><i aria-hidden="true">↗</i></button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card dark">
+        <h2>Últimos registros de hoy</h2>
+        <ul class="list" id="recent"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESPERDICIO -->
+  <section class="panel" id="tab-desperdicio" hidden>
+    <div class="two">
+      <div class="card">
+        <h2>Comida preparada y botada</h2>
+        <form id="wasteForm" autocomplete="off">
+          <div class="row three">
+            <div class="field wide">
+              <label for="wDate">Día</label>
+              <input id="wDate" type="date" data-w>
+            </div>
+            <div class="field">
+              <label for="wPrep">Preparadas</label>
+              <input id="wPrep" type="number" inputmode="numeric" min="0" step="1" placeholder="Raciones" data-w>
+            </div>
+            <div class="field">
+              <label for="wWaste">Botadas</label>
+              <input id="wWaste" type="number" inputmode="numeric" min="0" step="1" placeholder="Raciones" data-w>
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px">
+            <label for="wMenu">Menú del día (opcional)</label>
+            <input id="wMenu" placeholder="Ej: arroz, pollo guisado, ensalada, jugo" data-w>
+          </div>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn" type="submit" data-w>Guardar</button>
+          </div>
+        </form>
+        <div class="result" id="wasteResult"></div>
+      </div>
+
+      <div class="card">
+        <h2>Porcentaje botado por día</h2>
+        <div class="legend" id="wasteLegend"></div>
+        <div id="wasteChart"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Detalle por día</h2>
+      <div class="scroll" id="wasteTable"></div>
+    </div>
+  </section>
+
+  <!-- HORARIOS -->
+  <section class="panel" id="tab-horarios" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2 id="schedTitle">Horario de almuerzo</h2>
+        <button class="link" type="button" id="editToggle">Editar horario</button>
+      </div>
+      <div class="chips" id="dayChips" role="group" aria-label="Día de la semana"></div>
+      <p class="hint" id="schedSummary"></p>
+      <div class="slots" id="slots"></div>
+    </div>
+
+    <div class="card" id="addCard" hidden>
+      <h2>Agregar turno</h2>
+      <form id="slotForm" autocomplete="off">
+        <div class="row three">
+          <div class="field wide">
+            <label for="sCourse">Curso</label>
+            <input id="sCourse" placeholder="Ej: 6° B" data-w>
+          </div>
+          <div class="field">
+            <label for="sStart">Entra</label>
+            <input id="sStart" type="time" value="12:00" data-w>
+          </div>
+          <div class="field">
+            <label for="sEnd">Sale</label>
+            <input id="sEnd" type="time" value="12:15" data-w>
+          </div>
+        </div>
+        <div class="checks" id="sDays" style="margin-top:12px"></div>
+        <div class="actions" style="margin-top:16px">
+          <button class="btn" type="submit" data-w>Agregar turno</button>
+          <button class="btn ghost" type="button" id="clearSlots" data-w>Vaciar horario</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- TARJETAS -->
+  <section class="panel" id="tab-tarjetas" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2>Lector de tarjetas</h2>
+        <span class="pill next" id="readerStatus">Pendiente de conexión</span>
+      </div>
+      <p class="hint">Este cuadro queda listo para que ustedes configuren el lector del chip después. Lo que guarden aquí no conecta nada todavía; solo deja anotados los datos.</p>
+      <form id="readerForm" autocomplete="off">
+        <div class="row">
+          <div class="field">
+            <label for="rType">Tipo de tarjeta</label>
+            <select id="rType" data-w>
+              <option value="">Sin definir</option>
+              <option>Chip RFID / NFC</option>
+              <option>Código de barras</option>
+              <option>Banda magnética</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rMode">Cómo se conecta</label>
+            <select id="rMode" data-w>
+              <option value="">Sin definir</option>
+              <option>USB (escribe como teclado)</option>
+              <option>Bluetooth</option>
+              <option>Servicio web (API)</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="field">
+            <label for="rFormat">Formato del código</label>
+            <input id="rFormat" placeholder="Ej: 10 dígitos" data-w>
+          </div>
+          <div class="field">
+            <label for="rUrl">Dirección del servicio</label>
+            <input id="rUrl" placeholder="https://…" inputmode="url" data-w>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label for="rNotes">Notas</label>
+          <textarea id="rNotes" placeholder="Marca del lector, proveedor, contacto técnico…" data-w></textarea>
+        </div>
+        <div class="actions" style="margin-top:16px">
+          <button class="btn" type="submit" data-w>Guardar configuración</button>
+          <span class="hint" id="readerSaved"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <h2>Tarjetas y estudiantes</h2>
+        <div class="placeholder">Pendiente. Aquí se cargará la lista que une cada tarjeta con su estudiante y su curso (código, nombre, curso).</div>
+        <div class="actions"><button class="btn ghost" type="button" disabled>Importar lista</button></div>
+      </div>
+
+      <div class="card">
+        <h2>Probar un toque</h2>
+        <p class="hint">Escribe un código y presiona Enter, o pasa la tarjeta si el lector escribe como teclado. Se registra en el curso que está en turno.</p>
+        <form id="tapForm" autocomplete="off">
+          <div class="field">
+            <label for="tapCode">Código de la tarjeta</label>
+            <input id="tapCode" placeholder="Ej: 0045872316" data-w>
+          </div>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn" type="submit" data-w>Simular toque</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="toast" role="status" hidden></div>
+
+<script src="script.js"></script>
+</body>
+</html>
